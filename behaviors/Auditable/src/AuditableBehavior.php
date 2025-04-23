@@ -11,6 +11,7 @@ namespace MRingler\Propel\Behavior\Auditable;
 use Propel\Generator\Behavior\SyncedTable\TableSyncer\TableSyncer;
 use Propel\Generator\Behavior\Util\InsertCodeBehavior;
 use Propel\Generator\Builder\Om\ObjectBuilder;
+use Propel\Generator\Model\ForeignKey;
 use Propel\Generator\Model\PropelTypes;
 use Propel\Generator\Model\Table;
 use stdClass;
@@ -78,7 +79,7 @@ class AuditableBehavior extends AuditableBehaviorDeclaration
             'size' => $this->getChangedValuesFieldSize(),
         ]);
 
-        $fk = $this->findSyncedRelation($syncedTable->getForeignKeys());
+        $fk = $this->findIncomingAuditRelationOnSourceTable($syncedTable);
         $internalChangedValuesColumnPhpName = $internalChangedValuesColumn->getPhpName();
 
         InsertCodeBehavior::addToTable($this, $syncedTable, [
@@ -151,5 +152,33 @@ class AuditableBehavior extends AuditableBehaviorDeclaration
         $templatePath = $this->getDirname() . '/templates/';
 
         return $this->renderTemplate($filename, $vars, $templatePath);
+    }
+
+    /**
+     * @param \Propel\Generator\Model\Table $auditTable
+     *
+     * @throws \LogicException
+     *
+     * @return ForeignKey
+     */
+    public function findIncomingAuditRelationOnSourceTable(Table $auditTable): ForeignKey
+    {
+        $relationFromSync = $this->findSyncedRelation($auditTable->getForeignKeys());
+        if ($relationFromSync) {
+            return $relationFromSync;
+        }
+
+        $incomingKeysFilter = fn (ForeignKey $fk) => $fk->getTable() === $auditTable;
+        $fksFromAudit = array_filter($this->table->getReferrers(),$incomingKeysFilter);
+        if (!$fksFromAudit) {
+            throw new \LogicException("Could not find relation from audited table ({$auditTable->getName()})"
+                . " to source table ({$this->getTable()->getName()}).");
+        }
+        if (count($fksFromAudit) > 1) {
+            throw new \LogicException("Found multiple relations from audited table ({$auditTable->getName()})"
+                . " to source table ({$this->getTable()->getName()}), but expect exactly one.");
+        }
+
+        return reset($fksFromAudit);
     }
 }

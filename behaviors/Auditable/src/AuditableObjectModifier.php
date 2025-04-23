@@ -59,7 +59,7 @@ protected \${$this->dataRowAttributeName} = null;
     public function objectMethods(ObjectBuilder $objectBuilder): string
     {
         $table = $this->behavior->getSyncedTable();
-        $fk = $this->behavior->findSyncedRelation($objectBuilder->getTable()->getReferrers());
+        $fk = $this->behavior->findIncomingAuditRelationOnSourceTable($this->behavior->getSyncedTable());
         $getPhpNameForFieldName = fn (string $fieldName) => $table->getColumn($fieldName)->getPhpName();
 
         return $this->behavior->renderLocalTemplate('sourceObjectMethods', [
@@ -124,16 +124,16 @@ EOT;
      */
     public function preUpdate(ObjectBuilder $objectBuilder)
     {
-        $table = $this->behavior->getSyncedTable();
-        $auditObjectClass = $table->getPhpName();
-        $fk = $this->behavior->findSyncedRelation($objectBuilder->getTable()->getReferrers());
-        $relationName = $objectBuilder->getRefFKPhpNameAffix($fk, false);
+        $auditTable = $this->behavior->getSyncedTable();
+        $auditObjectClass = $auditTable->getPhpName();
+        $fk = $this->behavior->findIncomingAuditRelationOnSourceTable($auditTable);
+        $relationIdentifier = $fk->getIdentifierReversed();
         $incrementStatement = $this->getIncrementAggregationColumnStatement("\n    ");
 
         return <<<EOT
 \$audit = \$this->create{$auditObjectClass}('update');
 if (\$ret && \$audit) {
-    \$this->add{$relationName}(\$audit);{$incrementStatement}
+    \$this->add{$relationIdentifier}(\$audit);{$incrementStatement}
 }
 EOT;
     }
