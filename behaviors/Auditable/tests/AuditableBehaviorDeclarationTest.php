@@ -19,6 +19,7 @@ namespace Propel\Tests\Generator\Behavior\Auditable;
 
 use Propel\Generator\Behavior\SyncedTable\SyncedTableException;
 use Propel\Generator\Model\Column;
+use Propel\Generator\Model\Datatype\ColumnType;
 use Propel\Generator\Model\PropelTypes;
 use Propel\Generator\Util\QuickBuilder;
 use Propel\Tests\TestCase;
@@ -42,7 +43,7 @@ class AuditableBehaviorDeclarationTest extends TestCase
         </database>
 EOT;
         $builder = new QuickBuilder();
-        $builder->setSchema($schemaXml);
+        $builder->setSchemaXml($schemaXml);
 
         $database = $builder->getDatabase();
         $table = $database->getTable('source_table_audit');
@@ -80,7 +81,7 @@ EOT;
            </database>
    EOT;
         $builder = new QuickBuilder();
-        $builder->setSchema($schemaXml);
+        $builder->setSchemaXml($schemaXml);
 
         $database = $builder->getDatabase();
         $table = $database->getTable('le_source_table_audit');
@@ -90,8 +91,8 @@ EOT;
         $expectedFieldNames = ['source_int_col', 'le_id', 'le_at', 'audit_event', 'internal_le_changes'];
         $this->assertEquals($expectedFieldNames, $fieldNames);
 
-        $changedValuesDomain = $table->getColumn('internal_le_changes')->getDomain();
-        $this->assertEquals(PropelTypes::CHAR, $changedValuesDomain->getType());
+        $changedValuesDomain = $table->getColumn('internal_le_changes')->getTypeMapping();
+        $this->assertEquals(ColumnType::CHAR, $changedValuesDomain->getColumnType());
         $this->assertEquals(2, $changedValuesDomain->getSize());
 
         $relation = $table->getForeignKeys()[0];
@@ -122,7 +123,7 @@ EOT;
         </database>
 EOT;
         $builder = new QuickBuilder();
-        $builder->setSchema($schemaXml);
+        $builder->setSchemaXml($schemaXml);
 
         $database = $builder->getDatabase();
         $table = $database->getTable('table');
@@ -161,7 +162,7 @@ EOT;
         </database>
 EOT;
         $builder = new QuickBuilder();
-        $builder->setSchema($schemaXml);
+        $builder->setSchemaXml($schemaXml);
 
         $this->expectException(SyncedTableException::class);
         $this->expectExceptionMessage("Cannot combine parameter 'cascade_delete' with array input for relation ('relation') - set onDelete behavior in array.");

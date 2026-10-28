@@ -14,17 +14,24 @@ namespace MRingler\Propel\Behavior\IntlDateGetters;
 use Propel\Generator\Builder\Om\ObjectBuilder;
 use Propel\Generator\Model\Behavior;
 use Propel\Generator\Model\Column;
+use Propel\Generator\Model\Datatype\ColumnType;
+use function array_key_exists;
+use function in_array;
+use function sprintf;
 
 class IntlDateGettersBehavior extends Behavior
 {
-    protected $parameters = array(
-        'function_name_format' => 'get%sUsingLocale',
-        'columns'              => null,
-        'use_intl'             => true,
-        'default_locale'       => 'null'
-    );
-    
-    const SQL_DATE_TYPES = ['DATE', 'DATETIME', 'TIMESTAMP'];
+    const SQL_DATE_TYPES = [ColumnType::DATE, ColumnType::DATETIME, ColumnType::TIMESTAMP];
+
+    public function __construct()
+    {
+        $this->parameters = [
+            'function_name_format' => 'get%sUsingLocale',
+            'columns'              => null,
+            'use_intl'             => true,
+            'default_locale'       => 'null'
+        ];
+    }
 
     public function objectMethods(ObjectBuilder $builder)
     {
@@ -60,7 +67,7 @@ class IntlDateGettersBehavior extends Behavior
         if( ! $this->isDateColumn($column))
         {
             $msgFormat  = 'Error when resolving behavior "localized_date": column "%s" in table "%s" is not a date column, but "%s"';
-            $msg        = sprintf($msgFormat, $columnName, $table->getName(), $column->getType());
+            $msg        = sprintf($msgFormat, $columnName, $table->getName(), $column->getColumnType()->name);
             throw new \InvalidArgumentException($msg);
         }
         return $column;
@@ -68,7 +75,7 @@ class IntlDateGettersBehavior extends Behavior
         
     private function isDateColumn(Column $column): bool
     {
-        $type = $column->getType();
+        $type = $column->getColumnType();
         return in_array($type, self::SQL_DATE_TYPES);
     }
     

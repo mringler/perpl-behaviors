@@ -12,7 +12,7 @@ use Propel\Generator\Behavior\SyncedTable\SyncedTableBehavior;
 use Propel\Generator\Behavior\SyncedTable\SyncedTableBehaviorDeclaration;
 use Propel\Generator\Behavior\SyncedTable\SyncedTableException;
 use Propel\Generator\Model\Column;
-use Propel\Generator\Model\PropelTypes;
+use Propel\Generator\Model\Datatype\ColumnType;
 
 class AuditableBehaviorDeclaration extends SyncedTableBehavior
 {
@@ -191,7 +191,7 @@ class AuditableBehaviorDeclaration extends SyncedTableBehavior
      */
     public function getChangedValuesFieldType(): string
     {
-        return $this->getParameter(static::PARAMETER_KEY_CHANGED_VALUES_FIELD_TYPE, PropelTypes::JSON);
+        return $this->getParameter(static::PARAMETER_KEY_CHANGED_VALUES_FIELD_TYPE, ColumnType::JSON->name);
     }
 
     /**
@@ -224,11 +224,13 @@ class AuditableBehaviorDeclaration extends SyncedTableBehavior
     }
 
     /**
-     * @return array<string>
+     * @return array<ColumnType>
      */
     public function getOmitValueFieldTypes(): array
     {
-        return $this->getParameterCsv(static::PARAMETER_KEY_OMIT_VALUE_TYPES, ['BLOB, CLOB']);
+        $stringValues = $this->getParameterCsv(static::PARAMETER_KEY_OMIT_VALUE_TYPES, null);
+
+        return $stringValues !== null ? array_map(fn ($s) => ColumnType::{$s}, $stringValues) : [ColumnType::BLOB, ColumnType::CLOB];
     }
 
     /**

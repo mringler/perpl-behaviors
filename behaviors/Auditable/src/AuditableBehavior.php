@@ -11,8 +11,8 @@ namespace MRingler\Propel\Behavior\Auditable;
 use Propel\Generator\Behavior\SyncedTable\TableSyncer\TableSyncer;
 use Propel\Generator\Behavior\Util\InsertCodeBehavior;
 use Propel\Generator\Builder\Om\ObjectBuilder;
+use Propel\Generator\Model\Datatype\ColumnType;
 use Propel\Generator\Model\ForeignKey;
-use Propel\Generator\Model\PropelTypes;
 use Propel\Generator\Model\Table;
 use stdClass;
 
@@ -70,7 +70,7 @@ class AuditableBehavior extends AuditableBehaviorDeclaration
             'defaultExpr' => 'CURRENT_TIMESTAMP',
         ]);
         $auditEventColumn = TableSyncer::addColumnIfNotExists($syncedTable, $this->getAuditEventFieldName(), [
-            'type' => PropelTypes::ENUM,
+            'type' => ColumnType::ENUM,
             'valueSet' => 'insert, update, delete, pre-audit',
             'required' => true,
         ]);
@@ -129,7 +129,7 @@ class AuditableBehavior extends AuditableBehaviorDeclaration
             if (in_array($fieldName, $ignoredFields)) {
                 continue;
             }
-            $isOmitted = (in_array($fieldName, $omittedFields) || in_array($column->getType(), $omittedTypes));
+            $isOmitted = (in_array($fieldName, $omittedFields) || in_array($column->getColumnType(), $omittedTypes));
             $auditedFields[] = [
                 'column' => $column,
                 'isOmitted' => $isOmitted,
