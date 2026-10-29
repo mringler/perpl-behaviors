@@ -108,14 +108,14 @@ class IntlDateGettersBehavior extends Behavior
     
     private function getLocalizedGetterCodeForColumn(Column $column): string
     {
-        $functionName   = $this->buildFunctionName($column);
-        $dataProperty   = $column->getName();
+        $functionName  = $this->buildFunctionName($column);
+        $accessValueStatement = '$this->get' . $column->getPhpName() . '()';
         $useIntl =  array_key_exists('use_intl', $this->parameters) && !in_array($this->parameters['use_intl'], [false, 'false', 0, null], true);
         $locale = $this->getDefaultLocale();
 
         return $useIntl
-            ? sprintf(self::FUNCTION_TEMPLATE_INTL, $functionName, $locale, $dataProperty)
-            : sprintf(self::FUNCTION_TEMPLATE_STRFTIME, $functionName, $dataProperty);
+            ? sprintf(self::FUNCTION_TEMPLATE_INTL, $functionName, $locale, $accessValueStatement)
+            : sprintf(self::FUNCTION_TEMPLATE_STRFTIME, $functionName, $accessValueStatement);
     }
 
     protected function getDefaultLocale(): string
@@ -142,7 +142,7 @@ class IntlDateGettersBehavior extends Behavior
  */
 public function %s(?string $format = null)
 {
-    $value = $this->%s;
+    $value = %s;
     if ($format === null) {
         return $value;
     }
@@ -178,7 +178,7 @@ const FUNCTION_TEMPLATE_INTL = <<<'EOT'
  */
 public function %s(?string $format = null, ?string $locale = %s)
 {
-    $value = $this->%s;
+    $value = %s;
     if ($format === null) {
         return $value;
     }
