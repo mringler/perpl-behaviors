@@ -83,7 +83,7 @@ class AuditableBehavior extends AuditableBehaviorDeclaration
         $internalChangedValuesColumnPhpName = $internalChangedValuesColumn->getPhpName();
 
         InsertCodeBehavior::addToTable($this, $syncedTable, [
-            'preInsert' => '$this->' . $auditedAtColumn->getName() . ' ??= new DateTime();',
+            'preInsert' => '$this->' . $auditedAtColumn->getName() . ' ??= new \DateTime();',
             'objectMethods' => fn (ObjectBuilder $builder) => $this->renderLocalTemplate('auditObjectMethods', [
                 'internalChangedValuesColumnPhpName' => $internalChangedValuesColumnPhpName,
                 'restoredChangedValuesColumnPhpName' => $this->getChangedValuesFieldPhpName(),
