@@ -57,11 +57,11 @@ protected static function groupAuditsBySource(array $audits): array
 }
 
 /**
- * @param ConnectionInterface $con (optional) The ConnectionInterface connection to use.
+ * @param ConnectionInterface $con|null
  *
  * @return array
  */
-public function get<?= $restoredChangedValuesColumnPhpName ?>(ConnectionInterface $con = null): array
+public function get<?= $restoredChangedValuesColumnPhpName ?>(ConnectionInterface|null $con = null): array
 {
     if (!$this->hasVirtualColumn('<?= $restoredChangedValuesColumnPhpName ?>')) {
 <?php
