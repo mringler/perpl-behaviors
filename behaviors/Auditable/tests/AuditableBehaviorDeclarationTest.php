@@ -42,8 +42,7 @@ class AuditableBehaviorDeclarationTest extends TestCase
             </table>
         </database>
 EOT;
-        $builder = new QuickBuilder();
-        $builder->setSchemaXml($schemaXml);
+        $builder = new QuickBuilder($schemaXml);
 
         $database = $builder->getDatabase();
         $table = $database->getTable('source_table_audit');
@@ -80,8 +79,7 @@ EOT;
                </table>
            </database>
    EOT;
-        $builder = new QuickBuilder();
-        $builder->setSchemaXml($schemaXml);
+        $builder = new QuickBuilder($schemaXml);
 
         $database = $builder->getDatabase();
         $table = $database->getTable('le_source_table_audit');
@@ -122,8 +120,7 @@ EOT;
             </table>
         </database>
 EOT;
-        $builder = new QuickBuilder();
-        $builder->setSchemaXml($schemaXml);
+        $builder = new QuickBuilder($schemaXml);
 
         $database = $builder->getDatabase();
         $table = $database->getTable('table');
@@ -161,8 +158,7 @@ EOT;
             </table>
         </database>
 EOT;
-        $builder = new QuickBuilder();
-        $builder->setSchemaXml($schemaXml);
+        $builder = new QuickBuilder($schemaXml));
 
         $this->expectException(SyncedTableException::class);
         $this->expectExceptionMessage("Cannot combine parameter 'cascade_delete' with array input for relation ('relation') - set onDelete behavior in array.");
